@@ -1,10 +1,11 @@
-package dz.cerist.android.mowafir;
+package dz.cerist.android.mowafire;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Build;
 import android.os.Handler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,9 +13,7 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 
-public class BluetoothService {
-
-    public final static int RECIEVE_MESSAGE = 1;		// Status  for Handler
+public class BluetoothService  implements SmartSocket{
 
     private BluetoothAdapter mAdapter = null;
 
@@ -28,8 +27,15 @@ public class BluetoothService {
 
     private String address = "20:13:05:02:00:13";
 
+    private Boolean status = Boolean.FALSE;
+
     public BluetoothService() {
         mAdapter = BluetoothAdapter.getDefaultAdapter();		// get Bluetooth adapter
+        try {
+            Connect_Bluetooth();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public BluetoothAdapter getAdapter() {
@@ -48,19 +54,12 @@ public class BluetoothService {
         this.mSocket = mSocket;
     }
 
-    public Handler getHandler() {
-        return handler;
-    }
-
-    public void setHandler(Handler handler) {
-        this.handler = handler;
-    }
 
     public void Write(String message){
         mConnectedThread.write(message);
     }
 
-    public void CloseSocket() throws IOException{
+    public void Close_Bluetooth() throws IOException{
         getSocket().close();
     }
 
@@ -76,7 +75,7 @@ public class BluetoothService {
         return  device.createRfcommSocketToServiceRecord(MY_UUID);
     }
 
-    public void Resume() throws  IOException{
+    public void Connect_Bluetooth() throws  IOException{
         BluetoothDevice device = mAdapter.getRemoteDevice(address);
 
         // Two things are needed to make a connection:
@@ -97,9 +96,71 @@ public class BluetoothService {
         mConnectedThread.start();
     }
 
+    @Override
+    public Boolean getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(Boolean status) {
+        String msg = status ? "1" : "0";
+        Write(msg);
+        this.status = status;
+    }
+
+    @Override
+    public void On() {
+        setStatus(Boolean.TRUE);
+    }
+
+    @Override
+    public void Off() {
+        setStatus(Boolean.FALSE);
+    }
+
+    @Override
+    public void setHandler(Handler handler) {
+        this.handler = handler;
+    }
+
+    @Override
+    public void Connect(){
+        try {
+            Connect_Bluetooth();
+        }catch (IOException e){
+
+        }
+    }
+
+    @Override
+    public void Close() {
+        try {
+            Close_Bluetooth();
+        }catch (IOException e){
+
+        }
+    }
+
+    /*TODO
+        private void checkBluetoothState() {
+            // Check for Bluetooth support and then check to make sure it is turned on
+            // Emulator doesn't support Bluetooth and will return null
+            if(mbluetooth.getAdapter() ==null) {
+                errorExit("Fatal Error", "Bluetooth not support");
+            } else {
+                if (mbluetooth.getAdapter().isEnabled()) {
+                    Log.d(TAG, "...Bluetooth ON...");
+                } else {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, 1);
+                }
+            }
+        }
+    */
     private class ConnectedThread extends Thread {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        StringBuilder sb = new StringBuilder();
 
         public ConnectedThread(BluetoothSocket socket) {
             InputStream tmpIn = null;
@@ -123,9 +184,23 @@ public class BluetoothService {
             // Keep listening to the InputStream until an exception occurs
             while (true) {
                 try {
-                    // Read from the InputStream
                     bytes = mmInStream.read(buffer);		// Get number of bytes and message in "buffer"
-                    handler.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();		// Send to message queue Handler
+
+                    byte[] readBuf = buffer;
+
+                    String strIncom = new String(readBuf, 0, bytes);					// create string from bytes array
+
+                    sb.append(strIncom);												// append string
+                    int endOfLineIndex = sb.indexOf("\r\n");							// determine the end-of-line
+                    if (endOfLineIndex > 0) { 											// if end-of-line,
+                        String sbprint = sb.substring(0, endOfLineIndex);				// extract string
+                        sb.delete(0, sb.length());										// and clear
+                        handler.obtainMessage(SmartSocket.RECIEVE_MESSAGE, sbprint).sendToTarget();
+                        handler.obtainMessage(SmartSocket.BT_RECIEVE_MESSAGE, sbprint).sendToTarget();
+                    }
+
+                    //handler.obtainMessage(SmartSocket.RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();		// Send to message queue Handler
+
                 } catch (IOException e) {
                     break;
                 }

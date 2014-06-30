@@ -15,8 +15,8 @@ SoftwareSerial mySerial(5, 6); //
 
 unsigned long energy_consumption = 1;
 
-char incomingByte;  // incoming data
-int  Device_Control_PIN = 12;
+char incomingByte;
+int  Device_Control_PIN = 3;
 
 uint16_t delays_number = 0;
 
@@ -24,7 +24,7 @@ boolean device_status = 0;
 
 void setup() {
   mySerial.begin(9600);
-  Serial.begin(9600);
+  //Serial.begin(9600);
   
   Mirf.spi = &MirfHardwareSpi;
   
@@ -35,7 +35,7 @@ void setup() {
   Mirf.payload = sizeof(unsigned long);
 
   Mirf.config();
-
+  
   pinMode(Device_Control_PIN, OUTPUT);
 }
 
@@ -54,6 +54,7 @@ void loop() {
        //mySerial.println("ON");
     }
   }
+
   
   if(Mirf.dataReady()){
     
@@ -93,13 +94,3 @@ void loop() {
   delays_number++;
   delay(50);
 }
-
-
-
-
-
-
-
-
-
-

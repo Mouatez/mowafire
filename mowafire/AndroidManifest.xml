@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="dz.cerist.android.mowafir"
+          package="dz.cerist.android.mowafire"
           android:versionCode="1"
           android:versionName="1.0">
 
-    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="19"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
 
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -12,18 +12,14 @@
 
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher">
 
-        <activity android:name="Mowafir"
+        <activity android:name="dz.cerist.android.mowafire.Mowafire"
                   android:label="@string/app_name"
                   android:configChanges="orientation|keyboardHidden"
                   android:screenOrientation="portrait"
                 >
         </activity>
 
-        <activity android:name="MainActivity"
-                  android:label="@string/app_name"
-                  android:configChanges="orientation|keyboardHidden"
-                  android:screenOrientation="portrait"
-                >
+        <activity android:name=".MainActivity" android:label="MOWAFIRE">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

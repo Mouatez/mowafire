@@ -19,6 +19,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 			energy_consumption_msg = arduino.readline()
 			if energy_consumption_msg != "":
 				self.write_message(energy_consumption_msg)
+				print 'message: %s.' % energy_consumption_msg
 			yield gen.Task(tornado.ioloop.IOLoop.instance().add_timeout, time.time() + .5)
 			
         @tornado.web.asynchronous
