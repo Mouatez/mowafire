@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 
 public class WebSocketService implements SmartSocket {
     private WebSocketClient mWebSocketClient;
-    private String ws_server_address = "ws://10.0.0.248:8888";
+    private String ws_server_address = "ws://10.0.1.96:8888";
     //private String ws_server_address = "ws://10.0.2.2:8888";
     private Boolean status = Boolean.FALSE;
     private Handler handler = null;
