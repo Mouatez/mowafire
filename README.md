@@ -7,3 +7,5 @@ Home energy consumption monitoring using:
 + android phone
 + python
 + websocket
+
+

@@ -26,7 +26,7 @@ int  Device_Control_PIN = 2;
 
 uint16_t delays_number = 0;
 
-boolean device_status = OFF;
+boolean device_status = ON;
 
 void setup() {
   mySerial.begin(9600);
@@ -103,6 +103,9 @@ void loop() {
     energy_consumption = effective_value;
     mySerial.println(energy_consumption);
   
+    Serial.print("energy_consumption: ");
+    Serial.println(energy_consumption);
+    
     sent_message_payload = energy_consumption;
   
     Mirf.setTADDR((byte *)SEND_ADDRESS);
